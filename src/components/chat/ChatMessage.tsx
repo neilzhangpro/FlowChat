@@ -14,10 +14,10 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         <div key={id} className={
             `flex ${role === 'user' ? 'justify-end' : 'justify-start'}`
         }>
-            <div className={`max-w-[80%] p-2 rounded-lg ${role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
+            <div className={`max-w-[80%] p-5 rounded-lg ${role === 'user' ? 'bg-blue-500 text-white' : role === 'welcome' ? 'bg-yellow-200 text-black' : 'bg-gray-200 text-gray-800'}`}>
               {content}
-              <span className={`block text-xs ${role === 'user' ? 'text-white' : 'text-gray-500'}`}>
-                {formatTime(timestamp)}
+              <span className={`block pt-3 text-xs ${role === 'user' ? 'text-white' : role === 'welcome' ? 'text-black' : 'text-gray-500'}`}>
+                @{formatTime(timestamp)}
               </span>
             </div>
         </div>
