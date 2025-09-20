@@ -9,6 +9,7 @@ export const ChatInterface: React.FC = () => {
         messages,
         isLoading,
         showTypingIndicator,
+        streamingMessageId,
         connectionStatus,
         sendMessage,
         clearMessages,
@@ -39,6 +40,7 @@ export const ChatInterface: React.FC = () => {
       <MessageList 
         messages={messages}
         showTypingIndicator={showTypingIndicator}
+        streamingMessageId={streamingMessageId}
       />
       
       {/* Input */}

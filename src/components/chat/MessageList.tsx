@@ -6,18 +6,20 @@ import { TypingIndicator } from "../common/TypingIndicator";
 interface MessageListProps {
     messages: Message[];
     showTypingIndicator: boolean;
+    streamingMessageId: string | null;
 }
 
 export const MessageList: React.FC<MessageListProps> = ({
     messages,
     showTypingIndicator,
+    streamingMessageId,
 }) => {
     const bottomRef = useRef<HTMLDivElement>(null);
 
     //auto scroll to the bottom
     useEffect(()=>{
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    },[messages]);
+    },[messages,showTypingIndicator,streamingMessageId]);
 
     //handle no data
     if(messages.length === 0) {
@@ -49,7 +51,7 @@ export const MessageList: React.FC<MessageListProps> = ({
                                     <TimeDivider timestamp={message.timestamp} />
                                 )
                             }
-                            <ChatMessage message={message} />
+                            <ChatMessage message={message} isStreaming={streamingMessageId === message.id} />
                         </div>
                     )
                 })}
@@ -60,6 +62,7 @@ export const MessageList: React.FC<MessageListProps> = ({
                         </div>
                     )
                 }
+                <div ref={bottomRef}></div>
             </div>
         </div>
     )

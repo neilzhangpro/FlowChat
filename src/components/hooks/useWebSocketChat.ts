@@ -11,6 +11,7 @@ export function useWebSocketChat({ url = 'ws://localhost:8080', autoReconnect = 
     const [messages, setMessages] = useState<Message[]>([])
     const [isLoading, setIsLoading] = useState(false);
     const [showTypingIndicator, setShowTypingIndicator] = useState(false);
+    const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
     const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected');
     const [error, setError] = useState<string | null>(null);
 
@@ -51,7 +52,30 @@ export function useWebSocketChat({ url = 'ws://localhost:8080', autoReconnect = 
     },[url])
 
     //send message to websocket
-    const sendMessage = () => {}
+    const sendMessage = useCallback(async (content:string)=>{
+        if (!content.trim() || isLoading || connectionStatus !== 'connected') return;
+
+        //add user message
+        const userMessage: Message = {
+            id: Date.now().toString(),
+            content,
+            role: 'user',
+            timestamp: new Date(),
+        }
+        setMessages(prev => [...prev, userMessage]);
+        
+
+        //send to websocket
+        if(wsRef.current?.readyState === WebSocket.OPEN) {
+            wsRef.current.send(JSON.stringify({
+                type: 'user',
+                data: {
+                    id: userMessage.id,
+                    content: userMessage.content,
+                }
+            }))
+        }
+    },[isLoading,connectionStatus])
 
     //add message to messages
     const addMessage = () => {}
@@ -75,6 +99,51 @@ export function useWebSocketChat({ url = 'ws://localhost:8080', autoReconnect = 
                         timestamp: new Date(message.data.timestamp),
                     }
                     setMessages(prev => [...prev, welcomeMessage]);
+                }
+                break;
+            case 'stream_start':
+                //start streaming
+                if(message.data){
+                    //creat empty message
+                    const emptyMessage: Message = {
+                        id: message.data.id,
+                        content: '',
+                        role: 'assistant',
+                        timestamp: new Date(message.data.timestamp),
+                    }
+                    setMessages(prev => [...prev, emptyMessage]);
+                    setShowTypingIndicator(false);
+                    setStreamingMessageId(message.data.id);
+                }
+                break;
+            case 'stream_chunk':
+                //update message
+                if(message.data){
+                    console.log('Stream chunk message:', message.data);
+                    const { content } = message.data;
+                    setMessages(prev => {
+                        // 找到最后一条assistant消息的索引
+                        for (let i = prev.length - 1; i >= 0; i--) {
+                            if (prev[i].role === 'assistant') {
+                                const newMessages = [...prev];
+                                newMessages[i] = {
+                                    ...newMessages[i],
+                                    content: newMessages[i].content + content
+                                };
+                                return newMessages;
+                            }
+                        }
+                        return prev;
+                    });
+                }
+                break;
+            case 'stream_end':
+                //end strwaming
+                if(message.data){
+                    const { id, content,timestamp} = message.data;
+                    setMessages(prev => prev.map(message => message.id === id ? { ...message, content, timestamp } : message));
+                    setIsLoading(false);
+                    setStreamingMessageId(null);
                 }
                 break;
             default:
@@ -109,6 +178,7 @@ export function useWebSocketChat({ url = 'ws://localhost:8080', autoReconnect = 
         showTypingIndicator,
         connectionStatus,
         error,
+        streamingMessageId,
         sendMessage,
         addMessage,
         clearMessages,
