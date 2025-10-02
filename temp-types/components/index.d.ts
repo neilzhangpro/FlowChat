@@ -1,0 +1,12 @@
+export { FlowChat, default as FlowChatComponent } from './FlowChat';
+export type { FlowChatConfig } from './FlowChat';
+export { ThemeProvider, useTheme, themes } from './theme/ThemeProvider';
+export type { ChatTheme } from './theme/ThemeProvider';
+export { ChatInterface } from './chat/ChatInterface';
+export { MessageList } from './chat/MessageList';
+export { ChatMessage } from './chat/ChatMessage';
+export { MessageInput } from './input/MessageInput';
+export { TypingIndicator } from './common/TypingIndicator';
+export { useWebSocketChat } from './hooks/useWebSocketChat';
+export type { Message, ChatState } from './types/chat.types';
+export { formatTime } from '../utils/formatTime';

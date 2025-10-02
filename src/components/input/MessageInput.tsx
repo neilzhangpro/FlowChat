@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import type { KeyboardEvent } from "react";
 import { Send, Loader2 } from "lucide-react";
+import { useTheme } from "../theme/ThemeProvider";
 
 interface MessageInputProps {
     onSendMessage: (message: string) => void;
@@ -14,6 +15,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     placeholder = "Type your message...",
 }) => {
     const [inputValue, setInputValue] = useState("");
+    const theme = useTheme();
 
     //handle input change
     const handleSend = () => {
@@ -31,7 +33,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     }
     //render
     return (
-        <div className="bg-white border-t border-gray-200 p-4">
+        <div className={theme.input.container}>
             <div className="flex gap-2">
                 <input
                 type="text"
@@ -39,9 +41,13 @@ export const MessageInput: React.FC<MessageInputProps> = ({
                 onKeyDown={handleKeyDown}
                 value={inputValue}
                 placeholder={placeholder}
-                className="flex-3 px-4 py-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={theme.input.field}
                 />
-                <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600" onClick={handleSend} disabled={inputValue.trim() === ''}>
+                <button 
+                    className={inputValue.trim() === '' ? theme.input.button.disabled : theme.input.button.enabled} 
+                    onClick={handleSend} 
+                    disabled={inputValue.trim() === ''}
+                >
                     {isLoading ? <Loader2 className="animate-spin" /> : <Send />}
                 </button>
             </div>

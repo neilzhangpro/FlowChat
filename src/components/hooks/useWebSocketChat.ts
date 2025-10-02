@@ -8,6 +8,7 @@ interface WebSocketChatOptions {
 
 
 export function useWebSocketChat({ url = 'ws://localhost:8080', autoReconnect = true }: WebSocketChatOptions = {}) {
+    console.log('AutoReconnect enabled:', autoReconnect); // TODO: Implement autoReconnect functionality
     const [messages, setMessages] = useState<Message[]>([])
     const [isLoading, setIsLoading] = useState(false);
     const [showTypingIndicator, setShowTypingIndicator] = useState(false);

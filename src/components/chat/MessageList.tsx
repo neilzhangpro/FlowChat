@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import type { Message } from "../types/chat.types";
 import { ChatMessage } from "./ChatMessage";
 import { TypingIndicator } from "../common/TypingIndicator";
+import { useTheme } from "../theme/ThemeProvider";
 
 interface MessageListProps {
     messages: Message[];
@@ -15,6 +16,7 @@ export const MessageList: React.FC<MessageListProps> = ({
     streamingMessageId,
 }) => {
     const bottomRef = useRef<HTMLDivElement>(null);
+    const theme = useTheme();
 
     //auto scroll to the bottom
     useEffect(()=>{
@@ -24,17 +26,17 @@ export const MessageList: React.FC<MessageListProps> = ({
     //handle no data
     if(messages.length === 0) {
         return (
-            <div className="flex-1 flex items-center justify-center text-gray-500">
+            <div className={theme.emptyState.container}>
                 <div className="text-center">
-                    <p className="text-lg mb-2">Welcome to FlowChat!</p>
-                    <p className="text-sm text-gray-500">Start a conversation with me</p>
+                    <p className={theme.emptyState.title}>Welcome to FlowChat!</p>
+                    <p className={theme.emptyState.subtitle}>Start a conversation with me</p>
                 </div>
             </div>
         )
     }
     //render messages
     return (
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className={theme.messageList}>
             <div className="space-y-2">
                 {messages.map((message, index) => {
                     // judge if show time divider
@@ -71,9 +73,10 @@ export const MessageList: React.FC<MessageListProps> = ({
 
 //timedivder component
 const TimeDivider: React.FC<{ timestamp: Date }> = ({ timestamp }) => {
+    const theme = useTheme();
     return (
         <div className="flex justify-center my-2">
-            <span className="text-xs text-gray-400">{timestamp.toLocaleString()}</span>
+            <span className={theme.timeDivider}>{timestamp.toLocaleString()}</span>
         </div>
     )
 }

@@ -1,0 +1,33 @@
+# Source files
+src/
+public/
+*.html
+vite.config.ts
+vite.lib.config.ts
+tsconfig*.json
+eslint.config.js
+postcss.config.js
+
+# Development files
+.env*
+.vscode/
+.git/
+.gitignore
+*.log
+*.tsbuildinfo
+
+# Documentation (already included via files field)
+COMPONENT_USAGE.md
+
+# WebSocket server
+websocket/
+
+# Test files
+**/*.test.*
+**/*.spec.*
+__tests__/
+
+# Build artifacts (except dist)
+build/
+coverage/
+.nyc_output/

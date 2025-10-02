@@ -3,8 +3,21 @@ import { MessageList } from './MessageList';
 import { MessageInput } from '../input/MessageInput';
 //import { useChat } from '../hooks/useChat';
 import { useWebSocketChat } from '../hooks/useWebSocketChat';
+import { useTheme } from '../theme/ThemeProvider';
+import type { FlowChatConfig } from '../FlowChat';
 
-export const ChatInterface: React.FC = () => {
+interface ChatInterfaceProps {
+  config: FlowChatConfig;
+  onMessage?: (message: string) => void;
+  onConnectionChange?: (status: 'connecting' | 'connected' | 'disconnected') => void;
+}
+
+export const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
+  config,
+  onMessage,
+  onConnectionChange 
+}) => {
+  const theme = useTheme();
     const {
         messages,
         isLoading,
@@ -12,34 +25,57 @@ export const ChatInterface: React.FC = () => {
         streamingMessageId,
         connectionStatus,
         sendMessage,
-        clearMessages,
-        updateMessage,
-        handleMessage,
-        reconnect,
-        disconnect,
-    } = useWebSocketChat();
+    } = useWebSocketChat({
+        url: config.websocketUrl,
+        autoReconnect: config.autoReconnect
+    });
+
+    // 处理消息回调
+    React.useEffect(() => {
+        if (onMessage) {
+            // 监听用户消息
+            const userMessages = messages.filter(msg => msg.role === 'user');
+            if (userMessages.length > 0) {
+                const lastUserMessage = userMessages[userMessages.length - 1];
+                onMessage(lastUserMessage.content);
+            }
+        }
+    }, [messages, onMessage]);
+
+    // 处理连接状态回调
+    React.useEffect(() => {
+        if (onConnectionChange) {
+            onConnectionChange(connectionStatus);
+        }
+    }, [connectionStatus, onConnectionChange]);
     
     //render
     return (
-        <div className="h-screen flex flex-col bg-gray-50">
+        <div className={`h-full flex flex-col ${theme.container} ${config.containerClassName || ''}`}>
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 shadow-sm">
+      <header className={`${theme.header} ${config.headerClassName || ''} px-4 py-3`}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-semibold">FlowChat</h1>
-            <p className="text-xs text-gray-500">Another AI chat interface</p>
+            <h1 className={theme.headerTitle}>{config.title}</h1>
+            <p className={theme.headerSubtitle}>{config.subtitle}</p>
           </div>
-          <div className="text-xs text-gray-400 flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${connectionStatus === 'connected' ? 'bg-green-500' : 'bg-red-500'} animate-pulse`}></div>
-          <span>{messages.length} messages</span>
-          </div>
+          {(config.showConnectionStatus || config.showMessageCount) && (
+            <div className={`${theme.headerStats} flex items-center gap-2`}>
+              {config.showConnectionStatus && (
+                <div className={connectionStatus === 'connected' ? theme.connectionDot.connected : theme.connectionDot.disconnected}></div>
+              )}
+              {config.showMessageCount && (
+                <span>{messages.length} messages</span>
+              )}
+            </div>
+          )}
         </div>
       </header>
       
       {/* Messages */}
       <MessageList 
         messages={messages}
-        showTypingIndicator={showTypingIndicator}
+        showTypingIndicator={config.enableTypingIndicator ? showTypingIndicator : false}
         streamingMessageId={streamingMessageId}
       />
       
@@ -47,7 +83,7 @@ export const ChatInterface: React.FC = () => {
       <MessageInput 
         onSendMessage={sendMessage}
         isLoading={isLoading}   
-        placeholder="Type your message..."
+        placeholder={config.placeholder || "Type your message..."}
       />
     </div>
     )

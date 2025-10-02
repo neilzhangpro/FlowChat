@@ -1,18 +1,59 @@
 {
-  "name": "flowchat",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@tomiezhang/flowchat-react",
+  "version": "1.0.0",
+  "description": "A beautiful and customizable WebSocket chat component for React with theme support",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles": "./dist/style.css"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build && npm run build:types",
+    "build:lib": "vite build --config vite.lib.config.ts && npm run build:types && npm run generate:index-types",
+    "build:types": "tsc -p tsconfig.lib.json",
+    "generate:index-types": "echo '// 主组件\nexport { FlowChat, default as FlowChatComponent } from \"./components/FlowChat\";\nexport type { FlowChatConfig } from \"./components/FlowChat\";\n\n// 主题系统\nexport { ThemeProvider, useTheme, themes } from \"./components/theme/ThemeProvider\";\nexport type { ChatTheme } from \"./components/theme/ThemeProvider\";\n\n// 单独的组件（如果需要单独使用）\nexport { ChatInterface } from \"./components/chat/ChatInterface\";\nexport { MessageList } from \"./components/chat/MessageList\";\nexport { ChatMessage } from \"./components/chat/ChatMessage\";\nexport { MessageInput } from \"./components/input/MessageInput\";\nexport { TypingIndicator } from \"./components/common/TypingIndicator\";\n\n// Hooks\nexport { useWebSocketChat } from \"./components/hooks/useWebSocketChat\";\n\n// 类型\nexport type { Message, ChatState } from \"./components/types/chat.types\";\n\n// 工具函数\nexport { formatTime } from \"./utils/formatTime\";' > dist/index.d.ts",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build:lib"
+  },
+  "keywords": [
+    "react",
+    "chat",
+    "websocket",
+    "component",
+    "typescript",
+    "tailwindcss",
+    "theme",
+    "ui"
+  ],
+  "author": "Tomie Zhang <tomiezhang@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/neilzhangpro/FlowChat.git"
+  },
+  "homepage": "https://github.com/neilzhangpro/FlowChat#readme",
+  "bugs": {
+    "url": "https://github.com/neilzhangpro/FlowChat/issues"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
   },
   "dependencies": {
-    "lucide-react": "^0.544.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "lucide-react": "^0.544.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
@@ -26,9 +67,12 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
     "postcss": "^8.5.6",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "tailwindcss": "^4.1.13",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
-    "vite": "^7.1.2"
+    "vite": "^7.1.2",
+    "vite-plugin-dts": "^4.5.4"
   }
 }
